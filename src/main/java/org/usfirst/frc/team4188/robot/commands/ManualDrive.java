@@ -33,7 +33,7 @@ public class ManualDrive extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	
-    	Robot.driveTrain.arcadeDrive(-pilotXboxController.getY(Hand.kLeft), -pilotXboxController.getX(Hand.kRight)*.7, 1.0);
+    	Robot.driveTrain.arcadeDrive(-pilotXboxController.getY(Hand.kLeft), pilotXboxController.getX(Hand.kRight)*.7, 1.0);
     	/*
 	    if(autoTrans = true) {
 	    	if (-Math.signum(leftVelocity) == Math.signum(rightVelocity)) {
