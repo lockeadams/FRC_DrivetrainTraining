@@ -1,7 +1,7 @@
 package robot;
 
-import robot.commands.GearShiftIn;
-import robot.commands.GearShiftOut;
+import robot.commands.drive.GearShiftIn;
+import robot.commands.drive.GearShiftOut;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 

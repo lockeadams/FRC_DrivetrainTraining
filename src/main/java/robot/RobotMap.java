@@ -1,6 +1,7 @@
 package robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -9,6 +10,8 @@ public class RobotMap {
 	public static WPI_TalonSRX frontRight, frontLeft, rearLeft, rearRight;
 	public static DifferentialDrive drive;
 	public static DoubleSolenoid gearShift;
+	public static ADXRS450_Gyro gyro;
+
 	
 	public static void init() {
 		
@@ -21,6 +24,8 @@ public class RobotMap {
 		frontLeft.follow(rearLeft);
 		
 		drive = new DifferentialDrive(rearLeft, rearRight);
+
+		gyro = new ADXRS450_Gyro();
 	
 		gearShift = new DoubleSolenoid(0,1);
 	}

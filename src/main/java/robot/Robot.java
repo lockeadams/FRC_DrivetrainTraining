@@ -1,4 +1,3 @@
-
 package robot;
 
 import robot.RobotMap;
@@ -26,7 +25,6 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void disabledInit() {
-
 	}
 
 	@Override

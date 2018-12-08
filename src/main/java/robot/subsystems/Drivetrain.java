@@ -1,7 +1,7 @@
 package robot.subsystems;
 
 import robot.RobotMap;
-import robot.commands.ManualDrive;
+import robot.commands.drive.ManualDrive;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Subsystem;
