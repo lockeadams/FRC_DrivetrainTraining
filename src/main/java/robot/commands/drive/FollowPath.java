@@ -1,8 +1,5 @@
 package robot.commands.drive;
 
-import java.util.FormattableFlags;
-
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.command.Command;
 import jaci.pathfinder.*;
 import jaci.pathfinder.followers.EncoderFollower;
@@ -73,7 +70,7 @@ public class FollowPath extends Command {
 
   @Override
   protected boolean isFinished() {
-    return false;
+    return left.isFinished();
   }
 
   @Override

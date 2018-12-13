@@ -3,16 +3,21 @@ package robot.commands.drive;
 import robot.Robot;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class GearShiftOut extends Command {
+public class ShiftGear extends Command {
 
-    public GearShiftOut() {
+    public enum Gear{HIGH, LOW}
+    Gear gear;
+
+    public ShiftGear(Gear gear) {
+        this.gear = gear;
     }
 
     protected void initialize() {
     }
 
     protected void execute() {
-    	Robot.m_drivetrain.shiftGearOut();
+        if(gear == Gear.HIGH) Robot.m_drivetrain.shiftGearIn();
+        if(gear == Gear.LOW) Robot.m_drivetrain.shiftGearOut();
     }
 
     protected boolean isFinished() {

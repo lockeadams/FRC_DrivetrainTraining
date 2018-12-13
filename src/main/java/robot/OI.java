@@ -1,7 +1,7 @@
 package robot;
 
-import robot.commands.drive.GearShiftIn;
-import robot.commands.drive.GearShiftOut;
+import robot.commands.drive.*;
+import robot.commands.drive.ShiftGear.Gear;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
@@ -17,8 +17,8 @@ public class OI {
 		pilot9 = new JoystickButton(pilot, 9);
 		pilot10 = new JoystickButton(pilot, 10);
 		
-		pilot9.whenPressed(new GearShiftIn());
-		pilot10.whenPressed(new GearShiftOut());
+		pilot9.whenPressed(new ShiftGear(Gear.HIGH));
+		pilot10.whenPressed(new ShiftGear(Gear.LOW));
 	}
 	
 	
