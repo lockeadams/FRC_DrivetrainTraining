@@ -9,75 +9,63 @@ import robot.RobotMap;
 
 public class FollowPath extends Command {
 
-  Waypoint[] points;
-  Trajectory.Config config;
-  Trajectory trajectory;
-  TankModifier modifier;
-  EncoderFollower left, right;
-  final double MAX_VELOCITY, MAX_ACCELERATION, MAX_JERK;
-  final double WHEELBASE_WIDTH, WHEEL_DIAMETER;
-  final int TICKS_PER_REV;
-  final double kP, kI, kD, kV, kA;
+    Waypoint[] points;
+    Trajectory.Config config;
+    Trajectory trajectory;
+    TankModifier modifier;
+    EncoderFollower left, right;
+    final double kP, kI, kD, kV, kA;
 
-  public FollowPath(Waypoint[] points) {
-    requires(Robot.m_drivetrain);
-    this.points = points;
+    public FollowPath(Waypoint[] points) {
+        requires(Robot.m_drivetrain);
+        this.points = points;
 
-    MAX_VELOCITY = 0;
-    MAX_ACCELERATION = 0;
-    MAX_JERK = 0;
+        kP = 1.0;
+        kI = 0;
+        kD = 0;
+        kV = 0;
+        kA = 0;
+        //https://www.chiefdelphi.com/forums/showthread.php?t=161828 for tuning help
+    }
 
-    WHEELBASE_WIDTH = 0;
-    WHEEL_DIAMETER = 6;
-    TICKS_PER_REV = 4600;
+    @Override
+    protected void initialize() {
+        config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, RobotMap.MAX_VELOCITY, RobotMap.MAX_ACCELERATION, RobotMap.MAX_JERK);
+        trajectory = Pathfinder.generate(points, config);
+        modifier = new TankModifier(trajectory).modify(RobotMap.WHEELBASE_WIDTH);
+        left = new EncoderFollower(modifier.getLeftTrajectory());
+        right = new EncoderFollower(modifier.getRightTrajectory());
+        left.configureEncoder(RobotMap.left.getSelectedSensorPosition(0), RobotMap.TICKS_PER_REV, RobotMap.WHEEL_DIAMETER);
+        right.configureEncoder(RobotMap.right.getSelectedSensorPosition(0), RobotMap.TICKS_PER_REV, RobotMap.WHEEL_DIAMETER);
+        left.configurePIDVA(kP, kI, kD, kV, kA);
+        right.configurePIDVA(kP, kI, kD, kV, kA);
+    }
 
-    kP = 0;
-    kI = 0;
-    kD = 0;
-    kV = 1 / MAX_VELOCITY;
-    kA = 0;
-    //https://www.chiefdelphi.com/forums/showthread.php?t=161828 for tuning help
+    @Override
+    protected void execute() {
+        double l = left.calculate(RobotMap.left.getSelectedSensorPosition(0));
+        double r = right.calculate(RobotMap.right.getSelectedSensorPosition(0));
 
-  }
+        double gyroHeading = RobotMap.gyro.getAngle();
+        double desiredHeading = Pathfinder.r2d(left.getHeading());
 
-  @Override
-  protected void initialize() {
-    config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, MAX_VELOCITY, MAX_ACCELERATION, MAX_JERK);
-    trajectory = Pathfinder.generate(points, config);
-    modifier = new TankModifier(trajectory).modify(WHEELBASE_WIDTH);
-    left = new EncoderFollower(modifier.getLeftTrajectory());
-    right = new EncoderFollower(modifier.getRightTrajectory());
-    left.configureEncoder(RobotMap.rearLeft.getSelectedSensorPosition(0), TICKS_PER_REV, WHEEL_DIAMETER);
-    right.configureEncoder(RobotMap.rearRight.getSelectedSensorPosition(0), TICKS_PER_REV, WHEEL_DIAMETER);
-    left.configurePIDVA(kP, kI, kD, kV, kA);
-    right.configurePIDVA(kP, kI, kD, kV, kA);
-  }
+        double angleDifference = Pathfinder.boundHalfDegrees(desiredHeading - gyroHeading);
+        double turn = 0.8 * (-1.0/80.0) * angleDifference; //simple P loop with kP from 254 presentation
 
-  @Override
-  protected void execute() {
-    double l = left.calculate(RobotMap.rearLeft.getSelectedSensorPosition(0));
-    double r = right.calculate(RobotMap.rearRight.getSelectedSensorPosition(0));
+        RobotMap.left.set(l + turn);
+        RobotMap.right.set(r - turn);
+    }
 
-    double gyroHeading = RobotMap.gyro.getAngle();
-    double desiredHeading = Pathfinder.r2d(left.getHeading());
+    @Override
+    protected boolean isFinished() {
+        return left.isFinished();
+    }
 
-    double angleDifference = Pathfinder.boundHalfDegrees(desiredHeading - gyroHeading);
-    double turn = 0.8 * (-1.0/80.0) * angleDifference; //simple P loop with kP from 254 presentation
+    @Override
+    protected void end() {
+    }
 
-    RobotMap.rearLeft.set(l + turn);
-    RobotMap.rearRight.set(r - turn);
-  }
-
-  @Override
-  protected boolean isFinished() {
-    return left.isFinished();
-  }
-
-  @Override
-  protected void end() {
-  }
-
-  @Override
-  protected void interrupted() {
-  }
+    @Override
+    protected void interrupted() {
+    }
 }

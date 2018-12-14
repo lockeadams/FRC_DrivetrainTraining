@@ -19,10 +19,15 @@ deploy {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile wpilib()
     compile ctre()
     compile pathfinder()
+    compile group: 'com.opencsv', name: 'opencsv', version: '4.1'
 }
 
 jar {

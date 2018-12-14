@@ -7,27 +7,34 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class RobotMap {
 
-	public static WPI_TalonSRX frontRight, frontLeft, rearLeft, rearRight;
+	//Constants
+	public static final double MAX_VELOCITY = 0; //ft/s
+    public static final double MAX_ACCELERATION = 0; //ft/s^2
+    public static final double MAX_JERK = 0; //ft/s^3
+    public static final double WHEELBASE_WIDTH = 0; //ft
+    public static final double WHEEL_DIAMETER = (6.0 / 12.0); //ft
+    public static final int TICKS_PER_REV = 4096; //talon units
+
+	// Device Declarations
+	public static WPI_TalonSRX left, right, rightSlave, leftSlave;
 	public static DifferentialDrive drive;
 	public static DoubleSolenoid gearShift;
 	public static ADXRS450_Gyro gyro;
 
-	
+	//Device Initialization
 	public static void init() {
-		
-		frontRight = new WPI_TalonSRX(8);
-		frontLeft = new WPI_TalonSRX(5);
-		rearRight = new WPI_TalonSRX(7);
-		rearLeft = new WPI_TalonSRX(6);
+		right = new WPI_TalonSRX(7);
+        left = new WPI_TalonSRX(6);
+        rightSlave = new WPI_TalonSRX(8);
+		leftSlave = new WPI_TalonSRX(5);
 
-		frontRight.follow(rearRight);
-		frontLeft.follow(rearLeft);
+		rightSlave.follow(right);
+		leftSlave.follow(left);
 		
-		drive = new DifferentialDrive(rearLeft, rearRight);
+		drive = new DifferentialDrive(left, right);
 
 		gyro = new ADXRS450_Gyro();
 	
 		gearShift = new DoubleSolenoid(0,1);
 	}
-	
 }
