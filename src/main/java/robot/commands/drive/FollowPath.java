@@ -1,5 +1,7 @@
 package robot.commands.drive;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.wpilibj.command.Command;
 import jaci.pathfinder.*;
 import jaci.pathfinder.followers.EncoderFollower;
@@ -13,7 +15,7 @@ public class FollowPath extends Command {
     Trajectory.Config config;
     Trajectory trajectory;
     TankModifier modifier;
-    EncoderFollower left, right;
+    EncoderFollower leftFollower, rightFollower;
     final double kP, kI, kD, kV, kA;
 
     public FollowPath(Waypoint[] points) {
@@ -23,31 +25,42 @@ public class FollowPath extends Command {
         kP = 1.0;
         kI = 0;
         kD = 0;
-        kV = 0;
+        kV = 1 / RobotMap.MAX_VELOCITY;
         kA = 0;
         //https://www.chiefdelphi.com/forums/showthread.php?t=161828 for tuning help
     }
 
     @Override
     protected void initialize() {
-        config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, RobotMap.MAX_VELOCITY, RobotMap.MAX_ACCELERATION, RobotMap.MAX_JERK);
+        config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.005, RobotMap.MAX_VELOCITY, RobotMap.MAX_ACCELERATION, RobotMap.MAX_JERK);
         trajectory = Pathfinder.generate(points, config);
         modifier = new TankModifier(trajectory).modify(RobotMap.WHEELBASE_WIDTH);
-        left = new EncoderFollower(modifier.getLeftTrajectory());
-        right = new EncoderFollower(modifier.getRightTrajectory());
-        left.configureEncoder(RobotMap.left.getSelectedSensorPosition(0), RobotMap.TICKS_PER_REV, RobotMap.WHEEL_DIAMETER);
-        right.configureEncoder(RobotMap.right.getSelectedSensorPosition(0), RobotMap.TICKS_PER_REV, RobotMap.WHEEL_DIAMETER);
-        left.configurePIDVA(kP, kI, kD, kV, kA);
-        right.configurePIDVA(kP, kI, kD, kV, kA);
+
+        leftFollower = new EncoderFollower(modifier.getLeftTrajectory());
+        rightFollower = new EncoderFollower(modifier.getRightTrajectory());
+
+        leftFollower.configureEncoder(RobotMap.left.getSelectedSensorPosition(0), RobotMap.TICKS_PER_REV, RobotMap.WHEEL_DIAMETER);
+        rightFollower.configureEncoder(RobotMap.right.getSelectedSensorPosition(0), RobotMap.TICKS_PER_REV, RobotMap.WHEEL_DIAMETER);
+        leftFollower.configurePIDVA(kP, kI, kD, kV, kA);
+        rightFollower.configurePIDVA(kP, kI, kD, kV, kA);
+
+        RobotMap.left.setSelectedSensorPosition(0, 0, 10);
+        RobotMap.right.setSelectedSensorPosition(0, 0, 10);
+        RobotMap.left.setNeutralMode(NeutralMode.Brake);
+        RobotMap.right.setNeutralMode(NeutralMode.Brake);
+
+        System.out.println("Following path");
     }
 
     @Override
     protected void execute() {
-        double l = left.calculate(RobotMap.left.getSelectedSensorPosition(0));
-        double r = right.calculate(RobotMap.right.getSelectedSensorPosition(0));
+        double l = leftFollower.calculate(RobotMap.left.getSelectedSensorPosition(0));
+        double r = rightFollower.calculate(RobotMap.right.getSelectedSensorPosition(0));
+
+        //System.out.println("l: " + l + " r: " + r);
 
         double gyroHeading = RobotMap.gyro.getAngle();
-        double desiredHeading = Pathfinder.r2d(left.getHeading());
+        double desiredHeading = Pathfinder.r2d(leftFollower.getHeading());
 
         double angleDifference = Pathfinder.boundHalfDegrees(desiredHeading - gyroHeading);
         double turn = 0.8 * (-1.0/80.0) * angleDifference; //simple P loop with kP from 254 presentation
@@ -58,11 +71,12 @@ public class FollowPath extends Command {
 
     @Override
     protected boolean isFinished() {
-        return left.isFinished();
+        return leftFollower.isFinished();
     }
 
     @Override
     protected void end() {
+        System.out.println("Done following path.");
     }
 
     @Override

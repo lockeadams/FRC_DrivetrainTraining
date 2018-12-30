@@ -13,7 +13,7 @@ public class Drivetrain extends Subsystem {
     DoubleSolenoid gearShift = RobotMap.gearShift;
         
 	public void initDefaultCommand() {
-		setDefaultCommand(new ManualDrive());
+		//setDefaultCommand(new ManualDrive());
     }
     
     public void arcadeDrive(double x, double twist, double throttle){

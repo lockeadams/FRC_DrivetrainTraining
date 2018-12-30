@@ -1,6 +1,7 @@
 package robot;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -9,10 +10,10 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 public class RobotMap {
 
     //Constants
-    public static final double MAX_VELOCITY = 0; //ft/s
-    public static final double MAX_ACCELERATION = 0; //ft/s^2
-    public static final double MAX_JERK = 0; //ft/s^3
-    public static final double WHEELBASE_WIDTH = 0; //ft
+    public static final double MAX_VELOCITY = 5; //ft/s
+    public static final double MAX_ACCELERATION = 1; //ft/s^2
+    public static final double MAX_JERK = 60; //ft/s^3
+    public static final double WHEELBASE_WIDTH = 2.37; //ft
     public static final double WHEEL_DIAMETER = (6.0 / 12.0); //ft
     public static final int TICKS_PER_REV = 4096; //talon units
 
@@ -29,6 +30,9 @@ public class RobotMap {
         rightSlave = new WPI_TalonSRX(8);
         leftSlave = new WPI_TalonSRX(5);
 
+        left.setInverted(true);
+        leftSlave.setInverted(true);
+
         rightSlave.follow(right);
         leftSlave.follow(left);
         left.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
@@ -36,6 +40,6 @@ public class RobotMap {
 		
         drive = new DifferentialDrive(left, right);
         gyro = new ADXRS450_Gyro();
-        gearShift = new DoubleSolenoid(0,1);
+        //gearShift = new DoubleSolenoid(0,1);
 	}
 }

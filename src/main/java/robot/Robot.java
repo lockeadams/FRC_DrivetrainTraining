@@ -1,12 +1,13 @@
 package robot;
 
-import robot.RobotMap;
-import robot.OI;
+import robot.*;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.*;
+import jaci.pathfinder.Waypoint;
 import robot.subsystems.*;
+import robot.commands.drive.*;
 
 public class Robot extends IterativeRobot {
 
@@ -17,9 +18,9 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void robotInit() {
-		m_oi = new OI();
 		RobotMap.init();
 		m_drivetrain = new Drivetrain();
+		m_oi = new OI();
 		
 	}
 
@@ -35,8 +36,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		autonomousCommand = chooser.getSelected();
-		if (autonomousCommand != null)
-			autonomousCommand.start();
+		if (autonomousCommand != null) autonomousCommand.start();
 	}
 
 	@Override
@@ -46,8 +46,7 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopInit() {
-		if (autonomousCommand != null)
-			autonomousCommand.cancel();
+		if (autonomousCommand != null) autonomousCommand.cancel();
 	}
 
 	@Override

@@ -2,10 +2,10 @@ package robot.commands.tuning;
 
 import java.io.FileWriter;
 import java.io.IOException;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.opencsv.CSVWriter;
 import edu.wpi.first.wpilibj.command.Command;
+import robot.Robot;
 import robot.RobotMap;
 
 public class RecordVelocity extends Command {
@@ -16,6 +16,7 @@ public class RecordVelocity extends Command {
     double voltage;
 
     public RecordVelocity() {
+        requires(Robot.m_drivetrain);
     }
 
     @Override
